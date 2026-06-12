@@ -1,0 +1,27 @@
+{
+  "name": "escar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal webhook workbench for receiving, inspecting, copying, and replaying webhooks.",
+  "author": "zendrix",
+  "license": "MIT",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "bun run --cwd backend dev",
+    "dev:frontend": "bun run --cwd frontend dev",
+    "build": "bun run --cwd shared build && bun run --cwd backend build && bun run --cwd frontend build",
+    "start": "bun run --cwd backend start"
+  },
+  "keywords": [
+    "webhook",
+    "debugging",
+    "replay",
+    "self-hosted",
+    "open-source",
+    "webhook-workbench"
+  ]
+}

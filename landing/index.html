@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escar - Webhook Workbench</title>
+  <meta name="description" content="Escar is a personal webhook workbench for receiving, inspecting, copying, forwarding, and replaying webhook traffic.">
+  <meta name="keywords" content="webhook, debugger, workbench, self-hosted, replay">
+  <meta property="og:title" content="Escar - Webhook Workbench">
+  <meta property="og:description" content="Receive, inspect, copy, forward, and replay webhook traffic.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Escar - Webhook Workbench">
+  <meta name="twitter:description" content="A focused webhook workbench for local integration debugging.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23f7f4ee'/><path d='M68 24 H34 C27 24 22 29 22 36 V64 C22 71 27 76 34 76 H70' fill='none' stroke='%23166e68' stroke-width='10' stroke-linecap='round' stroke-linejoin='round'/><path d='M36 50 H66' stroke='%2321302f' stroke-width='10' stroke-linecap='round'/></svg>">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f7f4ee;
+      --surface: #fffdf8;
+      --ink: #21302f;
+      --muted: #6d756f;
+      --border: #d8d0c2;
+      --accent: #166e68;
+      --accent-hover: #0f5853;
+      --clay: #d95f3d;
+    }
+
+    body {
+      font-family: "Jost", "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      letter-spacing: 0;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 253, 248, 0.88);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 72px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--ink);
+      color: var(--surface);
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--ink);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 15px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+      gap: 44px;
+      align-items: center;
+      padding: 82px 0 70px;
+    }
+
+    .eyebrow {
+      color: var(--clay);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      max-width: 540px;
+      font-size: clamp(42px, 6vw, 70px);
+      line-height: 0.96;
+      letter-spacing: 0;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 19px;
+      margin-bottom: 28px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .preview {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 16px 48px rgba(33, 48, 47, 0.14);
+    }
+
+    .preview img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .section {
+      padding: 58px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section h2 {
+      font-size: 32px;
+      margin-bottom: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .feature {
+      min-height: 148px;
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .feature h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .code {
+      overflow-x: auto;
+      padding: 18px;
+      border-radius: 8px;
+      background: #182321;
+      color: #edf6ed;
+      font: 14px/1.6 "SF Mono", Consolas, monospace;
+    }
+
+    footer {
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 54px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <nav>
+        <a href="/" class="logo"><span class="mark">E</span>Escar</a>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#run">Run</a>
+          <a href="../README.md">Docs</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <div>
+        <div class="eyebrow">Personal webhook workbench</div>
+        <h1>Inspect webhook traffic without leaving your machine.</h1>
+        <p>Escar captures incoming webhook requests, shows the raw details, copies events as cURL, and replays payloads into any target endpoint.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#run">Run locally</a>
+          <a class="btn btn-secondary" href="#features">View features</a>
+        </div>
+      </div>
+      <div class="preview">
+        <img src="screenshot.jpeg" alt="Escar webhook debugger interface">
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="container">
+        <h2>Built for integration debugging</h2>
+        <div class="grid">
+          <div class="feature">
+            <h3>Capture</h3>
+            <p>Create hook URLs and store incoming headers, body, content type, method, and timestamp.</p>
+          </div>
+          <div class="feature">
+            <h3>Inspect</h3>
+            <p>Use a focused three-panel interface for hooks, captured events, and request detail.</p>
+          </div>
+          <div class="feature">
+            <h3>Replay</h3>
+            <p>Send captured events to any URL and keep replay history for debugging retries.</p>
+          </div>
+          <div class="feature">
+            <h3>Copy cURL</h3>
+            <p>Turn any selected event into a command you can run, share, or paste into docs.</p>
+          </div>
+          <div class="feature">
+            <h3>Forward</h3>
+            <p>Forward incoming webhooks to localhost or another service while still recording the request.</p>
+          </div>
+          <div class="feature">
+            <h3>Monitor</h3>
+            <p>Alert Slack, Discord, or email when expected webhook traffic stops arriving.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="run" class="section">
+<div class="container">
+        <h2>Run locally</h2>
+        <pre class="code">bun install
+bun run --cwd shared build
+bun run dev:backend
+bun run dev:frontend</pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">Escar is MIT licensed and built as a personal webhook debugging project.</div>
+  </footer>
+</body>
+</html>
